@@ -16,7 +16,7 @@ class Graph:
     widths = []
     nomen = []
     
-    def __init__(self, filename):
+    def __init__(self, filename, directed = True):
         with open(filename) as file:
             rows = file.readlines()
             
@@ -42,10 +42,10 @@ class Graph:
                 width = int(i[2])
                 
                 self.adj_list[a].append(b)
-                self.adj_list[b].append(a)
+                if not directed: self.adj_list[b].append(a)
                 
                 self.widths[a][b] = width
-                self.widths[b][a] = width
+                if not directed: self.widths[b][a] = width
                 
                 self.adj_list_T[b].append(a)
         
@@ -351,7 +351,8 @@ class Graph:
         print('Rank      : ', self.rank)
         print('Arvore    : ', T)
         print('AGM width : ', agm)
-n = Graph('grafos/g8.txt')
 
-n.kruskal(2)
+n = Graph('grafos/g13.txt', directed=True)
+
+n.bellman_ford(7)
 
