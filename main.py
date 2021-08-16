@@ -29,7 +29,6 @@ class Graph:
             self.adj_list_T = [[] for _ in range(self.num_vertex)]
             
             
-            print(self.num_vertex)
             self.widths = np.zeros((self.num_vertex, self.num_vertex), dtype=np.int64)
             self.nomen = [[""]*self.num_vertex for _ in range(self.num_vertex)]
         
@@ -43,10 +42,10 @@ class Graph:
                 width = int(i[2])
                 
                 self.adj_list[a].append(b)
-                #self.adj_list[b].append(a)
+                self.adj_list[b].append(a)
                 
                 self.widths[a][b] = width
-                #self.widths[b][a] = width
+                self.widths[b][a] = width
                 
                 self.adj_list_T[b].append(a)
         
@@ -219,7 +218,7 @@ class Graph:
         edges = []
         for i in range(0, self.num_vertex):
             for u in self.adj_list[i]:
-                if (i, u) not in edges:
+                if (i, u) not in edges and (u, i) not in edges:
                     edges.append((i, u))
 
         return edges
@@ -245,7 +244,114 @@ class Graph:
         print('Dist : ', d)
         print('PI   : ', pi)
 
-n = Graph('grafos/g12.txt')
+    def inTuple(self, v, tuple):
+        for (_, b) in tuple:
+            if b == v: return True
+        
+        return False
+    def prim(self, s = 0):
+        chave = []
+        pi = []
+        
+        for i in range(0, self.num_vertex):
+            chave.append(math.inf)
+            pi.append(None)
+        
+        chave[s] = 0
 
-n.bellman_ford(0)
+        Q = []
+
+
+        for i in range(0, self.num_vertex):
+                heapq.heappush(Q, (chave[i], i))
+
+                
+        
+        while Q: 
+            [pd, u] = heapq.heappop(Q)
+            
+            for v in self.adj_list[u]:
+                
+                if self.inTuple(v, Q) and chave[v] > self.widths[u][v]:
+                    chave[v] = self.widths[u][v]
+                    pi[v] = u
+
+        T = []
+        peso_agm = 0
+
+        for i in range(0, len(pi)):
+            if i != s:
+                T.append((i, pi[i]))
+                peso_agm= peso_agm + self.widths[i][pi[i]]
+
+        print('Dist        : ', chave)
+        print('PI          : ', pi)
+        print('Arvore      : ', T)
+        print('Peso da AGM : ', peso_agm)
+
+    def makeset(self, u):
+        self.pi[u] = u
+        self.rank[u] = 0
+
+    def find(self, x):
+        while x != self.pi[x]:
+            x = self.pi[x]
+        
+        return x
+        
+    def union(self, u, v):
+        pu = self.find(u)
+        pv = self.find(v)
+        if self.rank[pu] > self.rank[pv]:
+            self.pi[pv] = pu
+        else:
+            self.pi[pu] = pv
+            if self.rank[pu] == self.rank[pv]:
+                self.rank[pv] = self.rank[pv] + 1
+
+    def order_edges(self):
+        edges = self.edges2array()
+        i = len(edges)
+        sorted = False
+        while i > 1 and not sorted:
+            sorted = True
+            
+            for j in range (1, i):
+                (a,b) = edges[j-1]
+                key = self.widths[a][b]
+                (a,b) = edges[j]
+
+                key_2 = self.widths[a][b]
+
+                if key > key_2:
+                    temp = edges[j-1]
+                    edges[j-1] = edges[j]
+                    edges[j] = temp
+                    sorted = False
+
+        return edges
+                
+    def kruskal(self, w):
+        self.pi = []
+        self.rank = []
+        for i in range(0, self.num_vertex):
+            self.pi.append(i)
+            self.rank.append(0)
+        T = []
+        edges = self.order_edges()
+
+        agm = 0
+        for (u, v) in edges:
+            if self.find(u) != self.find(v):
+                T.append((u, v))
+                agm = agm + self.widths[u][v]
+                self.union(u,v)
+
+        print('Pi        : ', self.pi)
+        print('Rank      : ', self.rank)
+        print('Arvore    : ', T)
+        print('AGM width : ', agm)
+n = Graph('grafos/g8.txt')
+
+n.kruskal(2)
 
