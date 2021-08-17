@@ -245,10 +245,21 @@ class Graph:
         print('PI   : ', pi)
 
     def inTuple(self, v, tuple):
-        for (_, b) in tuple:
-            if b == v: return True
+        for (a, _) in tuple:
+            if a == v: return True
         
         return False
+
+
+    def heap_top(self, heap, chave):
+        aux = heap[0]
+
+        for i in heap:
+            if chave[i] < chave[aux]:
+                aux = i
+        
+        return aux
+
     def prim(self, s = 0):
         chave = []
         pi = []
@@ -261,18 +272,16 @@ class Graph:
 
         Q = []
 
-
         for i in range(0, self.num_vertex):
-                heapq.heappush(Q, (chave[i], i))
-
-                
+            Q.append(i)
         
         while Q: 
-            [pd, u] = heapq.heappop(Q)
+            u = self.heap_top(Q, chave)
+            Q.remove(u)
             
             for v in self.adj_list[u]:
                 
-                if self.inTuple(v, Q) and chave[v] > self.widths[u][v]:
+                if v in Q and chave[v] > self.widths[u][v]:
                     chave[v] = self.widths[u][v]
                     pi[v] = u
 
@@ -331,7 +340,7 @@ class Graph:
 
         return edges
                 
-    def kruskal(self, w):
+    def kruskal(self, w=0):
         self.pi = []
         self.rank = []
         for i in range(0, self.num_vertex):
@@ -352,7 +361,7 @@ class Graph:
         print('Arvore    : ', T)
         print('AGM width : ', agm)
 
-n = Graph('grafos/g13.txt', directed=True)
+n = Graph('grafos/g8.txt', directed=False)
 
-n.bellman_ford(7)
+n.prim(2)
 
