@@ -359,9 +359,9 @@ class Graph:
         print('Pi        : ', self.pi)
         print('Rank      : ', self.rank)
         print('Arvore    : ', T)
-        print('AGM width : ', agm)
+        print('AGM weight : ', agm)
 
-n = Graph('grafos/g8.txt', directed=False)
+n = Graph('grafos/prim-kruskal.txt', directed=False)
 
-n.prim(2)
+n.kruskal()
 
